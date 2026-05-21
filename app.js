@@ -261,8 +261,15 @@ function renderChart(pts, gradients, hills, smoothed) {
   const labels   = pts.map(p => p.dist.toFixed(2));
   const eleData  = pts.map(p => p.ele);
 
-  // Segment colors based on gradient (per point)
-  const pointColors = gradients.map(g => gradeColor(g));
+  // Segment colors based on gradient (5-point segments, averaged gradient)
+  const segLen = 5;
+  const pointColors = pts.map((_, i) => {
+    const segStart = Math.floor(i / segLen) * segLen;
+    const segEnd = Math.min(segStart + segLen, gradients.length);
+    const segGrades = gradients.slice(segStart, segEnd);
+    const g = segGrades.reduce((a, b) => a + b, 0) / segGrades.length;
+    return gradeColor(g);
+  });
 
   // Top annotations
   const topAnnotations = {};
@@ -326,7 +333,7 @@ function renderChart(pts, gradients, hills, smoothed) {
             label: item => {
               const i = item.dataIndex;
               const g = gradients[i];
-              const cat = gradeCategory(g);
+              const cat = effortCategory(g);
               return [
                 `Elevation: ${item.raw.toFixed(0)} m`,
                 `Gradient:  ${g.toFixed(1)}%  (${cat})`,
@@ -340,7 +347,7 @@ function renderChart(pts, gradients, hills, smoothed) {
           ticks: {
             color: '#8892a4',
             maxTicksLimit: 10,
-            callback: v => `${v} km`,
+            callback: (v, i) => `${labels[i]} km`,
           },
           grid: { color: '#2e3247' },
         },
@@ -378,7 +385,8 @@ function renderMap(pts, gradients, hills) {
   const segLen = 5; // points per segment
   for (let i = 0; i < pts.length - segLen; i += segLen) {
     const slice = pts.slice(i, i + segLen + 1).map(p => [p.lat, p.lon]);
-    const g = gradients[i + Math.floor(segLen / 2)];
+    const segGrades = gradients.slice(i, i + segLen);
+    const g = segGrades.reduce((a, b) => a + b, 0) / segGrades.length;
     const midPt = pts[i + Math.floor(segLen / 2)];
     L.polyline(slice, {
       color: gradeColor(g),
