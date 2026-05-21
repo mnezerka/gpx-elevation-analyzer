@@ -278,19 +278,33 @@ function renderChart(pts, gradients, hills, smoothed) {
     return gradeColor(g);
   });
 
-  // Top annotations
-  const topAnnotations = {};
-  hills.forEach(h => {
-    topAnnotations[`top${h.idx}`] = {
-      type: 'point',
-      xValue: pts[h.peakIdx].dist,
-      yValue: pts[h.peakIdx].ele,
-      backgroundColor: '#818cf8',
-      radius: 5,
-      borderColor: '#fff',
-      borderWidth: 1,
-    };
-  });
+  // Hill peak markers drawn via inline plugin (no external annotation plugin needed)
+  const hillMarkers = hills.map(h => ({ idx: h.idx, dist: pts[h.peakIdx].dist, ele: pts[h.peakIdx].ele }));
+  const hillMarkerPlugin = {
+    id: 'hillMarkers',
+    afterDraw(chart) {
+      const { ctx, scales: { x, y } } = chart;
+      const R = 10;
+      hillMarkers.forEach(h => {
+        const cx = x.getPixelForValue(h.dist);
+        const cy = y.getPixelForValue(h.ele);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, 2 * Math.PI);
+        ctx.fillStyle = '#818cf8';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(h.idx), cx, cy);
+        ctx.restore();
+      });
+    },
+  };
 
   const ctx = document.getElementById('elev-chart').getContext('2d');
   chartInstance = new Chart(ctx, {
@@ -376,7 +390,7 @@ function renderChart(pts, gradients, hills, smoothed) {
         const p = pts[idx];
         updateHoverMarker(p.lat, p.lon);
       },
-    }],
+    }, hillMarkerPlugin],
   });
 }
 
@@ -450,13 +464,13 @@ function renderMap(pts, gradients, hills) {
   // Top markers
   hills.forEach(h => {
     const p = pts[h.peakIdx];
-    L.circleMarker([p.lat, p.lon], {
-      radius: 7,
-      fillColor: '#818cf8',
-      color: '#fff',
-      weight: 2,
-      fillOpacity: 1,
-    })
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="background:#818cf8;color:#fff;border:2px solid #fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;box-shadow:0 1px 3px rgba(0,0,0,.4)">${h.idx}</div>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
+    });
+    L.marker([p.lat, p.lon], { icon })
     .bindPopup(`<b>Hill ${h.idx}</b><br>
       Elevation: <b>${Math.round(h.topEle)} m</b><br>
       Climb: ${h.climb} m · ${h.length} km<br>
