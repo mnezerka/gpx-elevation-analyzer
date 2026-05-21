@@ -256,6 +256,7 @@ function renderSummary(s) {
 // ─── Render elevation chart ────────────────────────────────────────────────────
 let chartInstance = null;
 function renderChart(pts, gradients, hills, smoothed) {
+  clearHoverMarker();
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
   const labels   = pts.map(p => p.dist.toFixed(2));
@@ -358,7 +359,45 @@ function renderChart(pts, gradients, hills, smoothed) {
         },
       },
     },
+    plugins: [{
+      id: 'mapHoverSync',
+      afterEvent(chart, args) {
+        const e = args.event;
+        if (e.type === 'mouseout') { clearHoverMarker(); return; }
+        const active = chart.getActiveElements();
+        if (!active.length) { clearHoverMarker(); return; }
+        const idx = active[0].index;
+        const p = pts[idx];
+        updateHoverMarker(p.lat, p.lon);
+      },
+    }],
   });
+}
+
+// ─── Map hover marker ─────────────────────────────────────────────────────────
+let hoverMarker = null;
+
+function updateHoverMarker(lat, lon) {
+  if (!mapInstance) return;
+  if (!hoverMarker) {
+    hoverMarker = L.circleMarker([lat, lon], {
+      radius: 7,
+      color: '#ef4444',
+      fillColor: '#ef4444',
+      fillOpacity: 0.85,
+      weight: 2,
+      interactive: false,
+    }).addTo(mapInstance);
+  } else {
+    hoverMarker.setLatLng([lat, lon]);
+  }
+}
+
+function clearHoverMarker() {
+  if (hoverMarker && mapInstance) {
+    mapInstance.removeLayer(hoverMarker);
+    hoverMarker = null;
+  }
 }
 
 // ─── Render map ───────────────────────────────────────────────────────────────
@@ -373,7 +412,7 @@ function applyTileProvider(providerKey) {
 }
 
 function renderMap(pts, gradients, hills) {
-  if (mapInstance) { mapInstance.remove(); mapInstance = null; tileLayerInstance = null; }
+  if (mapInstance) { mapInstance.remove(); mapInstance = null; tileLayerInstance = null; hoverMarker = null; }
 
   const mapEl = document.getElementById('map');
   mapInstance = L.map(mapEl);
