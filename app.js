@@ -155,7 +155,8 @@ function detectHills(pts, smoothed) {
       length:    parseFloat(climbDist.toFixed(2)),
       avgGrade:  parseFloat(avgGrade.toFixed(1)),
       maxGrade:  parseFloat(maxGrade.toFixed(1)),
-      category:  gradeCategory(avgGrade),
+      category:    gradeCategory(avgGrade),
+      lengthClass: classifyLength(climbDist),
     });
   });
 
@@ -171,6 +172,12 @@ function detectHills(pts, smoothed) {
   deduped.sort((a, b) => a.startDist - b.startDist);
   deduped.forEach((h, i) => h.idx = i + 1);
   return deduped;
+}
+
+function classifyLength(km) {
+  if (km < 1)  return 'Short';
+  if (km <= 5) return 'Middle';
+  return 'Long';
 }
 
 function gradeCategory(g) {
@@ -472,10 +479,15 @@ function badgeHTML(cat) {
   return `<span class="badge badge-${cls}">${cat}</span>`;
 }
 
+function lengthBadgeHTML(cls) {
+  const map = { Short: 'length-short', Middle: 'length-middle', Long: 'length-long' };
+  return `<span class="badge badge-${map[cls] || 'length-short'}">${cls}</span>`;
+}
+
 function renderHillsTable(hills) {
   const tbody = document.getElementById('hills-tbody');
   if (!hills.length) {
-    tbody.innerHTML = '<tr><td colspan="9" style="padding:1rem;color:#8892a4;text-align:center">No significant hills detected</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" style="padding:1rem;color:#8892a4;text-align:center">No significant hills detected</td></tr>';
     return;
   }
   tbody.innerHTML = hills.map(h => `
@@ -489,6 +501,7 @@ function renderHillsTable(hills) {
       <td>${h.avgGrade}</td>
       <td>${h.maxGrade}</td>
       <td>${badgeHTML(h.category)}</td>
+      <td>${lengthBadgeHTML(h.lengthClass)}</td>
     </tr>
   `).join('');
 }

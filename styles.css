@@ -269,6 +269,9 @@ tbody td { padding: 0.6rem 0.9rem; }
 .badge-moderate{ background: rgba(234,179,8,0.15);  color: var(--moderate); }
 .badge-hard    { background: rgba(249,115,22,0.15); color: var(--hard); }
 .badge-veryhard{ background: rgba(239,68,68,0.15);  color: var(--veryhard); }
+.badge-length-short  { background: rgba(34,197,94,0.15);  color: var(--easy); }
+.badge-length-middle { background: rgba(234,179,8,0.15);  color: var(--moderate); }
+.badge-length-long   { background: rgba(239,68,68,0.15);  color: var(--veryhard); }
 
 .section-title {
   font-size: 1rem;
