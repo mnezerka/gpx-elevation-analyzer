@@ -329,7 +329,7 @@ function renderChart(pts, gradients, hills, smoothed) {
           titleColor: '#8892a4',
           bodyColor: '#e2e8f0',
           callbacks: {
-            title: items => `${items[0].label} km`,
+            title: items => `Distance from start: ${items[0].label} km`,
             label: item => {
               const i = item.dataIndex;
               const g = gradients[i];
