@@ -41,7 +41,15 @@
       </div>
     </div>
     <div class="panel">
-      <div class="panel-header">Track Map</div>
+      <div class="panel-header map-header">
+        Track Map
+        <select id="tile-provider">
+          <option value="osm">OpenStreetMap</option>
+          <option value="mapy-basic">Mapy.com — Basic</option>
+          <option value="mapy-outdoor">Mapy.com — Outdoor</option>
+          <option value="mapy-aerial">Mapy.com — Aerial</option>
+        </select>
+      </div>
       <div id="map"></div>
     </div>
   </div>

@@ -134,6 +134,22 @@ h1 {
 }
 .panel-body { padding: 1rem; }
 
+.map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.map-header select {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.map-header select:focus { outline: none; border-color: var(--accent); }
+
 #map { height: 400px; border-radius: 0 0 var(--radius) var(--radius); }
 #chart-container { position: relative; height: 300px; padding: 1rem; }
 

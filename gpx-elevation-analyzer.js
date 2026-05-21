@@ -4,6 +4,27 @@ const PROMINENCE_M  = 15;         // min prominence (m) to count as a hill
 const MIN_CLIMB_M   = 10;         // min climb height to display
 const GRADE = { easy: 4, moderate: 8, hard: 12 };
 
+const MAPY_API_KEY = 'XuWC4G9t0QFM3t-Ra5iKyxc54dal-3wsHFNTGsI04Ew';
+
+const TILE_PROVIDERS = {
+  'osm': {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    options: { attribution: '© OpenStreetMap contributors', maxZoom: 19 },
+  },
+  'mapy-basic': {
+    url: `https://api.mapy.cz/v1/maptiles/basic/256/{z}/{x}/{y}?apikey=${MAPY_API_KEY}`,
+    options: { attribution: '© <a href="https://mapy.com">Mapy.com</a>', maxZoom: 19 },
+  },
+  'mapy-outdoor': {
+    url: `https://api.mapy.cz/v1/maptiles/outdoor/256/{z}/{x}/{y}?apikey=${MAPY_API_KEY}`,
+    options: { attribution: '© <a href="https://mapy.com">Mapy.com</a>', maxZoom: 19 },
+  },
+  'mapy-aerial': {
+    url: `https://api.mapy.cz/v1/maptiles/aerial/256/{z}/{x}/{y}?apikey=${MAPY_API_KEY}`,
+    options: { attribution: '© <a href="https://mapy.com">Mapy.com</a>', maxZoom: 20 },
+  },
+};
+
 // ─── Utility: Haversine distance (km) ─────────────────────────────────────────
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -335,16 +356,23 @@ function renderChart(pts, gradients, hills, smoothed) {
 
 // ─── Render map ───────────────────────────────────────────────────────────────
 let mapInstance = null;
+let tileLayerInstance = null;
+
+function applyTileProvider(providerKey) {
+  if (!mapInstance) return;
+  const p = TILE_PROVIDERS[providerKey] || TILE_PROVIDERS['osm'];
+  if (tileLayerInstance) mapInstance.removeLayer(tileLayerInstance);
+  tileLayerInstance = L.tileLayer(p.url, p.options).addTo(mapInstance);
+}
+
 function renderMap(pts, gradients, hills) {
-  if (mapInstance) { mapInstance.remove(); mapInstance = null; }
+  if (mapInstance) { mapInstance.remove(); mapInstance = null; tileLayerInstance = null; }
 
   const mapEl = document.getElementById('map');
   mapInstance = L.map(mapEl);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 18,
-  }).addTo(mapInstance);
+  const providerKey = document.getElementById('tile-provider').value;
+  applyTileProvider(providerKey);
 
   // Color-coded polyline segments
   const segLen = 5; // points per segment
@@ -557,6 +585,10 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   document.getElementById('summary-grid').innerHTML = '';
   document.getElementById('hills-tbody').innerHTML = '';
   document.getElementById('grad-tbody').innerHTML = '';
+});
+
+document.getElementById('tile-provider').addEventListener('change', e => {
+  applyTileProvider(e.target.value);
 });
 
 setupTableSort();
