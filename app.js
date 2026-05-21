@@ -259,8 +259,7 @@ function renderChart(pts, gradients, hills, smoothed) {
   clearHoverMarker();
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
-  const labels   = pts.map(p => p.dist.toFixed(2));
-  const eleData  = pts.map(p => p.ele);
+  const eleData  = pts.map(p => ({ x: p.dist, y: p.ele }));
 
   // Segment colors based on gradient (5-point segments, averaged gradient)
   const segLen = 5;
@@ -277,7 +276,7 @@ function renderChart(pts, gradients, hills, smoothed) {
   hills.forEach(h => {
     topAnnotations[`top${h.idx}`] = {
       type: 'point',
-      xValue: pts[h.peakIdx].dist.toFixed(2),
+      xValue: pts[h.peakIdx].dist,
       yValue: pts[h.peakIdx].ele,
       backgroundColor: '#818cf8',
       radius: 5,
@@ -290,7 +289,6 @@ function renderChart(pts, gradients, hills, smoothed) {
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels,
       datasets: [{
         label: 'Elevation (m)',
         data: eleData,
@@ -330,13 +328,13 @@ function renderChart(pts, gradients, hills, smoothed) {
           titleColor: '#8892a4',
           bodyColor: '#e2e8f0',
           callbacks: {
-            title: items => `Distance from start: ${items[0].label} km`,
+            title: items => `Distance from start: ${items[0].parsed.x.toFixed(2)} km`,
             label: item => {
               const i = item.dataIndex;
               const g = gradients[i];
               const cat = effortCategory(g);
               return [
-                `Elevation: ${item.raw.toFixed(0)} m`,
+                `Elevation: ${item.parsed.y.toFixed(0)} m`,
                 `Gradient:  ${g.toFixed(1)}%  (${cat})`,
               ];
             },
@@ -345,10 +343,11 @@ function renderChart(pts, gradients, hills, smoothed) {
       },
       scales: {
         x: {
+          type: 'linear',
           ticks: {
             color: '#8892a4',
             maxTicksLimit: 10,
-            callback: (v, i) => `${labels[i]} km`,
+            callback: v => `${v.toFixed(1)} km`,
           },
           grid: { color: '#2e3247' },
         },
