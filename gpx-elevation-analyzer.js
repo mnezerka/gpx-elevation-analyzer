@@ -384,10 +384,9 @@ function renderMap(pts, gradients, hills) {
     .addTo(mapInstance);
   });
 
-  // Fit bounds
+  // Store bounds for re-fitting after the panel becomes visible
   const latlngs = pts.map(p => [p.lat, p.lon]);
-  console.log(L.polyline(latlngs).getBounds());
-  mapInstance.fitBounds(L.polyline(latlngs).getBounds(), { padding: [20, 20] });
+  mapInstance._trackBounds = L.polyline(latlngs).getBounds();
 }
 
 // ─── Render hills table ───────────────────────────────────────────────────────
@@ -520,8 +519,11 @@ function handleFile(file) {
       analyze(e.target.result);
       showSpinner(false);
       showResults(true);
-      // Fix map tile loading after display
-      setTimeout(() => mapInstance && mapInstance.invalidateSize(), 200);
+      setTimeout(() => {
+        if (!mapInstance) return;
+        mapInstance.invalidateSize();
+        if (mapInstance._trackBounds) mapInstance.fitBounds(mapInstance._trackBounds, { padding: [10, 10] });
+      }, 200);
     } catch (err) {
       showSpinner(false);
       showUpload(true);
