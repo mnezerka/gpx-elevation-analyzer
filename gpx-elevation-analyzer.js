@@ -591,4 +591,34 @@ document.getElementById('tile-provider').addEventListener('change', e => {
   applyTileProvider(e.target.value);
 });
 
+// ─── Fullscreen ───────────────────────────────────────────────────────────────
+const fullscreenBtn    = document.getElementById('fullscreen-btn');
+const fsEnterIcon      = document.getElementById('fs-enter-icon');
+const fsExitIcon       = document.getElementById('fs-exit-icon');
+const mapPanelEl       = document.querySelector('.map-panel');
+
+function updateFullscreenIcons() {
+  const isFs = !!document.fullscreenElement;
+  fsEnterIcon.style.display = isFs ? 'none'  : '';
+  fsExitIcon.style.display  = isFs ? ''      : 'none';
+}
+
+fullscreenBtn.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    mapPanelEl.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenIcons();
+  if (mapInstance) {
+    setTimeout(() => {
+      mapInstance.invalidateSize();
+      if (mapInstance._trackBounds) mapInstance.fitBounds(mapInstance._trackBounds, { padding: [10, 10] });
+    }, 100);
+  }
+});
+
 setupTableSort();
