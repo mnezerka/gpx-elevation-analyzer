@@ -108,14 +108,38 @@ h1 {
 .card .value { font-size: 1.35rem; font-weight: 700; color: var(--text); }
 .card .unit { font-size: 0.75rem; color: var(--text-muted); margin-left: 2px; }
 
-/* Two-col layout */
-.two-col {
+/* Main layout: left content + right map */
+.main-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-bottom: 1rem;
+  align-items: start;
 }
-@media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } }
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.right-col {
+  position: sticky;
+  top: 1rem;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+.map-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+#map {
+  flex: 1;
+  min-height: 400px;
+}
+@media (max-width: 860px) {
+  .main-layout { grid-template-columns: 1fr; }
+  .right-col { position: static; }
+}
 
 .panel {
   background: var(--surface);
@@ -150,7 +174,7 @@ h1 {
 }
 .map-header select:focus { outline: none; border-color: var(--accent); }
 
-#map { height: 400px; border-radius: 0 0 var(--radius) var(--radius); }
+#map { height: 100%; min-height: 400px; border-radius: 0 0 var(--radius) var(--radius); }
 #chart-container { position: relative; height: 300px; padding: 1rem; }
 
 /* Grade legend */

@@ -29,67 +29,72 @@
 <div id="results">
   <div class="summary-grid" id="summary-grid"></div>
 
-  <div class="two-col">
-    <div class="panel">
-      <div class="panel-header">Elevation Profile</div>
-      <div id="chart-container"><canvas id="elev-chart"></canvas></div>
-      <div class="grade-legend">
-        <span><span class="dot" style="background:var(--easy)"></span>Easy &lt;4%</span>
-        <span><span class="dot" style="background:var(--moderate)"></span>Moderate 4–8%</span>
-        <span><span class="dot" style="background:var(--hard)"></span>Hard 8–12%</span>
-        <span><span class="dot" style="background:var(--veryhard)"></span>Very Hard &gt;12%</span>
+  <div class="main-layout">
+    <div class="left-col">
+      <div class="panel">
+        <div class="panel-header">Elevation Profile</div>
+        <div id="chart-container"><canvas id="elev-chart"></canvas></div>
+        <div class="grade-legend">
+          <span><span class="dot" style="background:var(--easy)"></span>Easy &lt;4%</span>
+          <span><span class="dot" style="background:var(--moderate)"></span>Moderate 4–8%</span>
+          <span><span class="dot" style="background:var(--hard)"></span>Hard 8–12%</span>
+          <span><span class="dot" style="background:var(--veryhard)"></span>Very Hard &gt;12%</span>
+        </div>
+      </div>
+
+      <p class="section-title">Detected Hills &amp; Climbs</p>
+      <div class="table-wrapper">
+        <table id="hills-table">
+          <thead>
+            <tr>
+              <th data-col="idx">#</th>
+              <th data-col="startDist">Start km</th>
+              <th data-col="topDist">Top km</th>
+              <th data-col="topEle">Top ele (m)</th>
+              <th data-col="climb">Climb (m)</th>
+              <th data-col="length">Length (km)</th>
+              <th data-col="avgGrade">Avg grade %</th>
+              <th data-col="maxGrade">Max grade %</th>
+              <th data-col="category">Category</th>
+            </tr>
+          </thead>
+          <tbody id="hills-tbody"></tbody>
+        </table>
+      </div>
+
+      <p class="section-title">Gradient Statistics by Segment</p>
+      <div class="table-wrapper">
+        <table id="grad-table">
+          <thead>
+            <tr>
+              <th>Gradient Range</th>
+              <th>Distance (km)</th>
+              <th>Share (%)</th>
+              <th>Category</th>
+            </tr>
+          </thead>
+          <tbody id="grad-tbody"></tbody>
+        </table>
+      </div>
+
+      <button id="reset-btn">← Analyze another file</button>
+    </div>
+
+    <div class="right-col">
+      <div class="panel map-panel">
+        <div class="panel-header map-header">
+          Track Map
+          <select id="tile-provider">
+            <option value="osm">OpenStreetMap</option>
+            <option value="mapy-basic">Mapy.com — Basic</option>
+            <option value="mapy-outdoor">Mapy.com — Outdoor</option>
+            <option value="mapy-aerial">Mapy.com — Aerial</option>
+          </select>
+        </div>
+        <div id="map"></div>
       </div>
     </div>
-    <div class="panel">
-      <div class="panel-header map-header">
-        Track Map
-        <select id="tile-provider">
-          <option value="osm">OpenStreetMap</option>
-          <option value="mapy-basic">Mapy.com — Basic</option>
-          <option value="mapy-outdoor">Mapy.com — Outdoor</option>
-          <option value="mapy-aerial">Mapy.com — Aerial</option>
-        </select>
-      </div>
-      <div id="map"></div>
-    </div>
   </div>
-
-  <p class="section-title">Detected Hills &amp; Climbs</p>
-  <div class="table-wrapper">
-    <table id="hills-table">
-      <thead>
-        <tr>
-          <th data-col="idx">#</th>
-          <th data-col="startDist">Start km</th>
-          <th data-col="topDist">Top km</th>
-          <th data-col="topEle">Top ele (m)</th>
-          <th data-col="climb">Climb (m)</th>
-          <th data-col="length">Length (km)</th>
-          <th data-col="avgGrade">Avg grade %</th>
-          <th data-col="maxGrade">Max grade %</th>
-          <th data-col="category">Category</th>
-        </tr>
-      </thead>
-      <tbody id="hills-tbody"></tbody>
-    </table>
-  </div>
-
-  <p class="section-title">Gradient Statistics by Segment</p>
-  <div class="table-wrapper">
-    <table id="grad-table">
-      <thead>
-        <tr>
-          <th>Gradient Range</th>
-          <th>Distance (km)</th>
-          <th>Share (%)</th>
-          <th>Category</th>
-        </tr>
-      </thead>
-      <tbody id="grad-tbody"></tbody>
-    </table>
-  </div>
-
-  <button id="reset-btn">← Analyze another file</button>
 </div>
 
 <script src="gpx-elevation-analyzer.js"></script>
